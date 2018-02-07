@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Привет, {{ current_user.username }}</h1>
+    <h2>В вашем дневнике столько-то домашних заданий</h2>
+    {% for homework in homeworks %}
+        {{ homework }}<br>
+    {% endfor %}
+{% endblock %}

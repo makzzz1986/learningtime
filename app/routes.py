@@ -2,7 +2,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm
-from app.models import User
+from app.models import User, Comment, Homework, Task, Subtask, Answers
 from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from datetime import datetime
@@ -14,11 +14,25 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
+
 @app.route('/')
 @app.route('/index')
 # @login_required
 def index():
-    return render_template('index.html', title='Home')
+    if current_user.is_authenticated:
+        return redirect(url_for('cabinet'))
+    else:
+        return render_template('index.html', title='Домашняя страница')
+
+
+@app.route('/cabinet')
+def cabinet():
+    if current_user.is_authenticated:
+        homeworks = Homework.query.filter_by(user_id=current_user.id).all()
+        return render_template('cabinet.html', title='Ваш дневник', homeworks=homeworks)
+    else:
+        return redirect(url_for('index'))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -35,7 +49,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
+    return render_template('login.html', title='Войти', form=form)
 
 @app.route('/logout')
 def logout():
@@ -53,9 +67,9 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now registered!')
+        flash('Теперь вы готовы идти на занятия!')
         return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('register.html', title='Записаться в журнал', form=form)
 
 @app.route('/user/<username>')
 @login_required
@@ -80,5 +94,5 @@ def edit_profile():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
-    return render_template('edit_profile.html', title='Edit Profile', form=form)
+    return render_template('edit_profile.html', title='Изменить профиль', form=form)
 
