@@ -1,4 +1,5 @@
 import json
+from flask import request
 
 # класс задания
 class Box():
@@ -40,3 +41,22 @@ class Box():
             print('Wrong import')
             print(str(e))
             return False
+
+    def import_request(req):
+        sended = {}
+        # превращаем формы в словарь
+        for elem in request.form:
+            sended[elem] = request.form[elem]
+        # {'finish': '', 'level': '', 'theme': '', 'name': 'name', '1/1': 'werwe', '1/2': 'd', '1/3': '', 
+        # '1/4': '', '1/5': '', '2/1': '', '2/2': '', '2/3': '', '2/4': '', '2/5': '', '2/6': '', '3/1': '', '3/2': '', '3/3': ''}
+        self.level = sended['level']
+        self.course = sended['course']
+        self.theme = sended['theme']
+        self.name = sended['level']
+        temp_dict = {}
+        for elem in sended:
+            if '/' in elem:
+                sublist, line = elem.split('/')
+                if sublist in temp_dict:
+                    temp_dict[sublist] = {line: sended[elem]}
+        print(temp_dict)

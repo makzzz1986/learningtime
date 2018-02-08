@@ -39,9 +39,7 @@ def homework(hw_task):
 @login_required
 def add_task():
     if request.method == 'POST':
-        sended = {}
-        for elem in request.form:
-            sended[elem] = request.form[elem]
+        
 
         print(sended)
         return render_template('add_task.html', title='Добавить задание', subtasks=[[1,2,3,4,5], [11,22,33,44,55,66], [666,666,666]])
