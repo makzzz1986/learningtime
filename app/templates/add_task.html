@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form action="/add_task" method="post">
+        <button type="submit" name="finish">Сохранить задание</button><br>
+        Уровень: <input type="text" name="level"><br>
+        Тема: <input type="text" name="theme"><br>
+        Название: <input type="text" name="name"><br>
+        <hr>
+        {% for subtask in subtasks %}
+            {% set subtask_index = loop.index %}
+            Подзадание {{ subtask_index }}<br>
+            {% for line in subtask %}
+                <input type="text" name="{{ subtask_index ~ '/' ~ loop.index }}" value=""><br>
+                
+            {% endfor %}
+            <button type="submit" name="{{ subtask_index ~ '/add_line'}}">Добавить строку</button>
+            <hr>
+        {% endfor %}
+        <br>
+        <button type="submit" name="add_subtask">Добавить подзадание</button>
+    </form>
+{% endblock %}

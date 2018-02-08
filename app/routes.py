@@ -6,6 +6,7 @@ from app.models import User, Comment, Homework, Task, Subtask, Answers
 from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from datetime import datetime
+import helpers
 
 
 @app.before_request
@@ -17,7 +18,7 @@ def before_request():
 
 @app.route('/')
 @app.route('/index')
-# @login_required
+@login_required
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('cabinet'))
@@ -25,11 +26,36 @@ def index():
         return render_template('index.html', title='Домашняя страница')
 
 
+@app.route('/homework/<hw_task>')
+@login_required
+def homework(hw_task):
+    # print('>>>', hw_task)
+    task = Task.query.filter_by(id=hw_task).first_or_404()
+    subtasks = Subtask.query.filter_by(task_id=hw_task).all()
+    return render_template('homework.html', title='Домашка', task=task, subtasks=subtasks)
+
+
+@app.route('/add_task', methods=['GET', 'POST'])
+@login_required
+def add_task():
+    if request.method == 'POST':
+        sended = {}
+        for elem in request.form:
+            sended[elem] = request.form[elem]
+
+        print(sended)
+        return render_template('add_task.html', title='Добавить задание', subtasks=[[1,2,3,4,5], [11,22,33,44,55,66], [666,666,666]])
+    else:
+        return render_template('add_task.html', title='Добавить задание', subtasks=[[1,2,3,4,5], [11,22,33,44,55,66], [666,666,666]])
+
+
 @app.route('/cabinet')
+@login_required
 def cabinet():
     if current_user.is_authenticated:
-        homeworks = Homework.query.filter_by(user_id=current_user.id).all()
-        return render_template('cabinet.html', title='Ваш дневник', homeworks=homeworks)
+        homeworks = Homework.query.filter_by(user_id=current_user.id).join(Task, Homework.task_id==Task.id).all()
+        unfinished = len([x.finished for x in homeworks if x.finished==False])
+        return render_template('cabinet.html', title='Ваш дневник', homeworks=homeworks, unfinished=unfinished)
     else:
         return redirect(url_for('index'))
 
@@ -51,6 +77,7 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Войти', form=form)
 
+
 @app.route('/logout')
 def logout():
     logout_user()
@@ -71,6 +98,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Записаться в журнал', form=form)
 
+
 @app.route('/user/<username>')
 @login_required
 def user(username):
@@ -80,6 +108,7 @@ def user(username):
         {'author': user, 'body': 'Test post #2'}
     ]
     return render_template('user.html', user=user, posts=posts)
+
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required

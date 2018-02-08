@@ -2,8 +2,16 @@
 
 {% block content %}
     <h1>Привет, {{ current_user.username }}</h1>
-    <h2>В вашем дневнике столько-то домашних заданий</h2>
+    {% if unfinished > 0 %}
+        <h2>В вашем дневнике осталось невыполненных домашек: {{ unfinished }} </h2>
+    {% else %}
+        <h2>Вся домашняя работа выполнена, можно налить чайку!</h2>
+    {% endif %}
     {% for homework in homeworks %}
-        {{ homework }}<br>
+        {% if homework.finished %}
+            <span style="color: green;"><a href="{{ url_for('homework', hw_task=homework.current_task.id) }}">{{ homework.current_task.theme }}</a></span><br>
+        {% else %}
+            <span style="color: red;"><a href="{{ url_for('homework', hw_task=homework.current_task.id) }}">{{ homework.current_task.theme }}</a></span><br>
+        {% endif %}
     {% endfor %}
 {% endblock %}
