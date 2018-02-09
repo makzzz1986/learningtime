@@ -65,20 +65,21 @@ class Task(db.Model):
     course = db.Column(db.String(40))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     homework = db.relationship('Homework', backref='current_task', lazy='dynamic')
+    body = db.Column(db.Text)
     # homework_id = db.Column(db.Integer, db.ForeignKey('homework.id'))
-    subtask = db.relationship('Subtask', backref='task', lazy='dynamic')
+    # subtask = db.relationship('Subtask', backref='task', lazy='dynamic')
 
     def __repr__(self):
         return '<Task {}>'.format(self.name)
 
-class Subtask(db.Model):
-    __tablename__ = 'subtask'
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.String(1200))
-    task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
+# class Subtask(db.Model):
+#     __tablename__ = 'subtask'
+#     id = db.Column(db.Integer, primary_key=True)
+#     body = db.Column(db.String(1200))
+#     task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
 
-    def __repr__(self):
-        return '<Subtask {}>'.format(self.id)
+#     def __repr__(self):
+#         return '<Subtask {}>'.format(self.id)
 
 class Answers(db.Model):
     __tablename__ = 'answerks'

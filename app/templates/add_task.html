@@ -2,22 +2,38 @@
 
 {% block content %}
     <form action="/add_task" method="post">
-        <button type="submit" name="finish">Сохранить задание</button><br>
-        Уровень: <input type="text" name="level"><br>
-        Тема: <input type="text" name="theme"><br>
-        Название: <input type="text" name="name"><br>
+        {% if notification != '' %}
+            <span style='color: green;'>{{ notification }}</span><br>
+        {% endif %}
+
+        {% for error in subtasks['errors'] %}
+            <span style='color: red;'>[{{ error }}]</span><br>
+        {% endfor %}
+
+        <br>
+        <button type="submit" name="save">Сохранить задание</button><br>
+        <table>
+            <tr>
+                <td>Уровень:</td><td><input type="text" name="level" value="{{ subtasks['level'] }}"></td>
+            </tr><tr>
+                <td>Тема:</td><td><input type="text" name="theme" value="{{ subtasks['theme'] }}"></td>
+            </tr><tr>
+                <td>Название:</td><td><input type="text" name="name" value="{{ subtasks['name'] }}"></td>
+            </tr>
+        </table>
         <hr>
-        {% for subtask in subtasks %}
+        <span style='color: blue;'>Поля ввода пользователя делайте как ||  (две вертикальные черты)</span><br>
+        {% for subtask in subtasks['subs'] %}
             {% set subtask_index = loop.index %}
             Подзадание {{ subtask_index }}<br>
             {% for line in subtask %}
-                <input type="text" name="{{ subtask_index ~ '/' ~ loop.index }}" value=""><br>
+                <input type="text" name="{{ subtask_index ~ '/' ~ loop.index }}" value="{{line}}"><br>
                 
             {% endfor %}
             <button type="submit" name="{{ subtask_index ~ '/add_line'}}">Добавить строку</button>
             <hr>
         {% endfor %}
         <br>
-        <button type="submit" name="add_subtask">Добавить подзадание</button>
+        <button type="submit" name="x/add_subtask">Добавить подзадание</button>
     </form>
 {% endblock %}

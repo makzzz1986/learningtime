@@ -2,7 +2,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm
-from app.models import User, Comment, Homework, Task, Subtask, Answers
+from app.models import User, Comment, Homework, Task, Answers
 from werkzeug.urls import url_parse
 from flask_login import current_user, login_user, logout_user, login_required
 from datetime import datetime
@@ -38,13 +38,25 @@ def homework(hw_task):
 @app.route('/add_task', methods=['GET', 'POST'])
 @login_required
 def add_task():
+    subt_box = helpers.Box()
+    notification = ''
     if request.method == 'POST':
-        
-
-        print(sended)
-        return render_template('add_task.html', title='Добавить задание', subtasks=[[1,2,3,4,5], [11,22,33,44,55,66], [666,666,666]])
-    else:
-        return render_template('add_task.html', title='Добавить задание', subtasks=[[1,2,3,4,5], [11,22,33,44,55,66], [666,666,666]])
+        subt_box.import_request(request.form)
+        if ('save' in request.form) and (len(subt_box.export_dict()['errors']) != []):
+            print('>>> Saved!')
+            new_task = Task(
+                level=subt_box.export_json()['level'],
+                theme=subt_box.export_json()['theme'],
+                name=subt_box.export_json()['name'],
+                course=subt_box.export_json()['course'],
+                body=subt_box.export_json()['subs'])
+            # print(new_task)
+            db.session.add(new_task)
+            db.session.commit()
+            notification = 'Вы создали новое задание!'
+            # print(subt_box.export_json())
+    # print(subt_box.export_dict())
+    return render_template('add_task.html', title='Добавить задание', subtasks=subt_box.export_dict(), notification=notification)
 
 
 @app.route('/cabinet')
