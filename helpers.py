@@ -22,6 +22,7 @@ class Box():
         self.subs.append(lst)
 
     def export_dict(self):
+        # print(self.subs)
         return {'level': self.level, 'course': self.course, 'theme': self.theme, 'name': self.name, 'subs': self.subs, 'errors': self.errors}
 
     def export_json(self):
@@ -90,6 +91,7 @@ class Box():
         temp_dict = {}
         flag_add_line = ''
         flag_add_subtask = False
+        # разбираем формы реквеста
         for elem in sended:
             if '/' in elem:
                 sublist, line = elem.split('/')
@@ -98,10 +100,11 @@ class Box():
                 elif line == 'add_subtask': 
                     flag_add_subtask = True
                 else:
+                    # добавляем в словарь значения
                     if sublist in temp_dict:
-                        temp_dict[sublist][line] = sended[elem]
+                        temp_dict[sublist][line] = str_parse(sended[elem])
                     else:
-                        temp_dict[sublist] = {line: sended[elem]}
+                        temp_dict[sublist] = {line: str_parse(sended[elem])}
         if flag_add_line != '':
             # print(flag_add_line)
             temp_dict[flag_add_line][str(max([int(x) for x in temp_dict[flag_add_line].keys()])+1)] = ''
@@ -134,17 +137,24 @@ class Box():
         self.subs = temp_list
 
 
-
 # очистка задания от пустых подзаданий и строк
 def clear_list(lst):
     tmp_lst = []
     for subl in lst:
         tmp_sblst = []
         for line in subl:
-            if len(line.strip())>0:
-                tmp_sblst.append(line.strip())
+            # if len(line.strip())>0:
+            # если там пустой список типа:
+            if (len(line) == 1) and (line[0] == ''):
+                pass
+            else:
+                tmp_sblst.append(line)
         if len(tmp_sblst)>0:
             tmp_lst.append(tmp_sblst)
     return tmp_lst
 
 
+# переводим строку в список
+def str_parse(string):
+    # return string.replace('||', '||$BOX$||').split('||')
+    return ['||' if x=='$BOX$' else x for x in string.replace('||', '||$BOX$||').split('||')]

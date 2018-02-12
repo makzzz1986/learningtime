@@ -27,7 +27,7 @@
             {% set subtask_index = loop.index %}
             Подзадание {{ subtask_index }}<br>
             {% for line in subtask %}
-                <input type="text" name="{{ subtask_index ~ '/' ~ loop.index }}" value="{{line}}"><br>
+                <input type="text" name="{{ subtask_index ~ '/' ~ loop.index }}" value="{{line | join('') }}"><br>
                 
             {% endfor %}
             <button type="submit" name="{{ subtask_index ~ '/add_line'}}">Добавить строку</button>
